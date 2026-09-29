@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>zh_CN</string>
+    <key>CFBundleExecutable</key>
+    <string>TranslateIME</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.antigravity.inputmethod.TranslateIME</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>TranslateIME</string>
+    <key>CFBundleDisplayName</key>
+    <string>译打输入法 (TransIME)</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>InputMethodConnectionName</key>
+    <string>TransIME_1_Connection</string>
+    <key>InputMethodServerControllerClass</key>
+    <string>TransInputController</string>
+    <key>tsInputMethodCharacterRepertoireKey</key>
+    <array>
+        <string>Latn</string>
+        <string>Hans</string>
+    </array>
+    <key>ComponentInputModeDict</key>
+    <dict>
+        <key>tsInputModeListKey</key>
+        <dict>
+            <key>com.antigravity.inputmethod.TranslateIME.zh</key>
+            <dict>
+                <key>tsInputModeIsVisibleKey</key>
+                <true/>
+                <key>tsInputModePrimaryInScriptKey</key>
+                <true/>
+                <key>tsInputModeScriptKey</key>
+                <string>smSimpChinese</string>
+                <key>tsInputModePaletteIconFileKey</key>
+                <string>icon.png</string>
+            </dict>
+        </dict>
+    </dict>
+</dict>
+</plist>

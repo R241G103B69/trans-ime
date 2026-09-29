@@ -1,0 +1,5 @@
+.DS_Store
+*.o
+bin/TransType
+bin/test_engine
+bin/test_output

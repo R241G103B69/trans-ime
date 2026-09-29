@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransType 译打 · 智能翻译输入法 (交互式模拟器)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="desktop-container">
+    <!-- Top System Menu Bar -->
+    <header class="mac-menubar">
+      <div class="menu-left">
+        <span class="apple-icon"></span>
+        <span class="app-name">TransType 译打</span>
+        <span class="menu-item active">文件</span>
+        <span class="menu-item">编辑</span>
+        <span class="menu-item">词库</span>
+        <span class="menu-item">帮助</span>
+      </div>
+      <div class="menu-right">
+        <span class="status-badge" id="engineStatusBadge">🟢 离线词库就绪</span>
+        <span class="menu-icon" title="输入法状态">🔤 译</span>
+        <span class="menu-time" id="currentTime">12:00</span>
+      </div>
+    </header>
+
+    <!-- Main Workspace / Simulated Target Application -->
+    <main class="workspace">
+      <div class="app-window target-editor-window">
+        <div class="window-titlebar">
+          <div class="window-traffic-lights">
+            <span class="light close"></span>
+            <span class="light minimize"></span>
+            <span class="light zoom"></span>
+          </div>
+          <span class="window-title">工作邮件 / 协同聊天模拟器 (目标应用)</span>
+          <div class="window-actions">
+            <span class="hotkey-pill" id="triggerBtn" title="点击或按快捷键呼出">唤起输入法 (⌥ Space)</span>
+          </div>
+        </div>
+        
+        <div class="window-content">
+          <div class="instruction-banner">
+            <div class="banner-icon">💡</div>
+            <div class="banner-text">
+              <strong>体验指南：</strong> 这是你的目标工作应用（如 Slack、邮件或 Word）。按下 <kbd>⌥ Option</kbd> + <kbd>Space</kbd>（或点击右上角按钮）呼出<strong>【TransType 智能翻译输入法】</strong>，输入中文后选好词汇，即可<strong>直接将英文输出上屏</strong>到下方光标处！
+            </div>
+          </div>
+
+          <div class="target-editor-wrapper">
+            <textarea id="targetTextarea" placeholder="在这里体验英文上屏效果...
+例如呼出输入法，输入：“今天下午三点在会议室开会”，按回车或数字 1，英文将自动键入到这里！"></textarea>
+          </div>
+
+          <div class="preset-prompts">
+            <span class="preset-label">快速体验常用中文句子：</span>
+            <button class="preset-btn" data-text="今天下午三点在会议室开会">今天下午三点在会议室开会</button>
+            <button class="preset-btn" data-text="请问您明天下午是否有空开个会讨论项目进展">明天是否有空开会讨论进展</button>
+            <button class="preset-btn" data-text="麻烦查收一下附件中的最新文档">麻烦查收附件最新文档</button>
+            <button class="preset-btn" data-text="这个问题我已经修复了，你可以重新拉取代码测试一下">已修复问题，请拉取测试</button>
+            <button class="preset-btn" data-text="需求与技术方案">需求与技术方案 (词汇拆解)</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Floating Translation IME Panel (TransType HUD) -->
+    <div class="trans-hud-overlay" id="transHudOverlay">
+      <div class="trans-hud" id="transHud">
+        <div class="hud-header">
+          <div class="hud-title-wrap">
+            <span class="hud-logo">🔤</span>
+            <span class="hud-title">TransType 译打</span>
+            <span class="hud-tag">即打即译 · 选词上屏</span>
+          </div>
+          <div class="hud-settings-preview">
+            <span class="lang-tag">中 ➔ 英 [EN]</span>
+            <span class="close-hud-btn" id="closeHudBtn" title="关闭 (ESC)">✕</span>
+          </div>
+        </div>
+
+        <div class="hud-input-row">
+          <div class="search-icon">🔍</div>
+          <input type="text" id="hudInput" class="hud-input" 
+                 placeholder="输入中文或拼音（如：明天下午开会 / 方案 / nihao）..." 
+                 autocomplete="off" autofocus />
+          <div class="input-clear-btn" id="clearInputBtn">✕</div>
+        </div>
+
+        <!-- Style Filter Tabs -->
+        <div class="hud-filter-bar">
+          <span class="filter-tab active" data-filter="all">全部候选</span>
+          <span class="filter-tab" data-filter="natural">自然推荐</span>
+          <span class="filter-tab" data-filter="formal">商务正式</span>
+          <span class="filter-tab" data-filter="casual">日常口语</span>
+          <span class="filter-tab" data-filter="concise">精简短语</span>
+          <span class="filter-tab" data-filter="vocab">词汇拆解</span>
+        </div>
+
+        <!-- Candidates Container -->
+        <div class="hud-candidates-list" id="candidatesList">
+          <!-- Populated by JavaScript -->
+          <div class="hud-empty-state">
+            <div class="empty-icon">⌨️</div>
+            <div class="empty-text">请输入中文句子或词汇，实时生成多种英文表达与词汇选择</div>
+          </div>
+        </div>
+
+        <!-- Vocabulary Keywords Breakdown Drawer -->
+        <div class="hud-vocab-drawer" id="vocabDrawer" style="display: none;">
+          <div class="vocab-drawer-title">📌 核心词汇拆解与近义词：</div>
+          <div class="vocab-chips-container" id="vocabChipsContainer"></div>
+        </div>
+
+        <!-- Bottom Keyboard Shortcut Hints -->
+        <div class="hud-footer">
+          <div class="footer-hints">
+            <span class="hint-item"><kbd>↵ Enter</kbd> 首选上屏</span>
+            <span class="hint-item"><kbd>1-7</kbd> 选词上屏</span>
+            <span class="hint-item"><kbd>↑ / ↓</kbd> 切换选项</span>
+            <span class="hint-item"><kbd>ESC</kbd> 取消</span>
+          </div>
+          <div class="footer-engine-info" id="activeEngineText">
+            ⚡ 本地离线引擎 (0ms 瞬时)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toastNotification">已成功将选定英文输出至目标窗口！</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

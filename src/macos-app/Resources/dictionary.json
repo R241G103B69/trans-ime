@@ -1,0 +1,169 @@
+{
+  "sentences": [
+    {
+      "chinese": "今天下午三点在会议室开会",
+      "pinyin": "jintian xiawu sandian zai huiyishi kaihui",
+      "candidates": [
+        {"text": "Meeting in the conference room at 3 PM today.", "style": "自然推荐", "tone": "natural"},
+        {"text": "We will have a meeting in the conference room at 3:00 PM this afternoon.", "style": "正式书面", "tone": "formal"},
+        {"text": "Let's meet in the conference room at 3pm today.", "style": "日常口语", "tone": "casual"},
+        {"text": "3pm conference room meeting today.", "style": "精简短语", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "今天下午", "pinyin": "xiawu", "translations": ["this afternoon", "today afternoon"], "pos": "时间状语"},
+        {"word": "会议室", "pinyin": "huiyishi", "translations": ["conference room", "meeting room", "boardroom"], "pos": "名词"},
+        {"word": "开会", "pinyin": "kaihui", "translations": ["have a meeting", "hold a meeting", "meet"], "pos": "动词"}
+      ]
+    },
+    {
+      "chinese": "请问您明天下午是否有空开个会讨论项目进展",
+      "pinyin": "qingwen nin mingtian xiawu shifou youkong kaigehui taolun xiangmu jinzhan",
+      "candidates": [
+        {"text": "Could you please let me know if you are available tomorrow afternoon for a meeting to discuss project progress?", "style": "自然推荐", "tone": "natural"},
+        {"text": "Would you happen to have some time tomorrow afternoon to discuss the latest project progress?", "style": "商务专业", "tone": "formal"},
+        {"text": "Are you free to jump on a quick call tomorrow afternoon to go over project progress?", "style": "日常口语", "tone": "casual"},
+        {"text": "Available tomorrow afternoon to discuss project progress?", "style": "精简短语", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "有空", "pinyin": "youkong", "translations": ["available", "free", "have time"], "pos": "形容词"},
+        {"word": "讨论", "pinyin": "taolun", "translations": ["discuss", "go over", "talk through"], "pos": "动词"},
+        {"word": "项目进展", "pinyin": "xiangmu jinzhan", "translations": ["project progress", "project updates", "status"], "pos": "名词短语"}
+      ]
+    },
+    {
+      "chinese": "很高兴认识你",
+      "pinyin": "hen gaoxing renshi ni",
+      "candidates": [
+        {"text": "Nice to meet you.", "style": "自然推荐", "tone": "natural"},
+        {"text": "It is a pleasure to make your acquaintance.", "style": "正式书面", "tone": "formal"},
+        {"text": "Great meeting you!", "style": "日常口语", "tone": "casual"},
+        {"text": "Pleased to meet you.", "style": "精简礼貌", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "高兴", "pinyin": "gaoxing", "translations": ["glad", "pleased", "delighted"], "pos": "形容词"},
+        {"word": "认识", "pinyin": "renshi", "translations": ["meet", "get to know", "make acquaintance"], "pos": "动词"}
+      ]
+    },
+    {
+      "chinese": "麻烦查收一下附件中的最新文档",
+      "pinyin": "mafan chashou yixia fujian zhong de zuixin wendang",
+      "candidates": [
+        {"text": "Please find attached the latest document for your review.", "style": "商务通用", "tone": "formal"},
+        {"text": "Kindly check the attached file for the updated document.", "style": "礼貌正式", "tone": "formal"},
+        {"text": "Attached is the latest doc for you!", "style": "日常口语", "tone": "casual"},
+        {"text": "See attached for latest document.", "style": "精炼通知", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "查收", "pinyin": "chashou", "translations": ["find attached", "check", "review"], "pos": "动词"},
+        {"word": "附件", "pinyin": "fujian", "translations": ["attachment", "attached file"], "pos": "名词"},
+        {"word": "最新文档", "pinyin": "zuixin wendang", "translations": ["latest document", "updated file"], "pos": "名词短语"}
+      ]
+    },
+    {
+      "chinese": "这个问题我已经修复了，你可以重新拉取代码测试一下",
+      "pinyin": "zhege wenti wo yijing xiufu le, ni keyi chongxin laqu daima ceshi yixia",
+      "candidates": [
+        {"text": "I have fixed this issue, please pull the latest code and test it.", "style": "自然推荐", "tone": "natural"},
+        {"text": "This bug has been resolved. You can re-pull the repository and verify the fix.", "style": "专业技术", "tone": "formal"},
+        {"text": "Just pushed a fix for this! Pull and give it a spin.", "style": "极客口语", "tone": "casual"},
+        {"text": "Issue fixed. Please pull and verify.", "style": "精简指令", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "修复", "pinyin": "xiufu", "translations": ["fix", "resolve", "patch"], "pos": "动词"},
+        {"word": "拉取代码", "pinyin": "laqu daima", "translations": ["pull the code", "pull the latest changes"], "pos": "动词短语"},
+        {"word": "测试", "pinyin": "ceshi", "translations": ["test", "verify", "validate"], "pos": "动词"}
+      ]
+    },
+    {
+      "chinese": "如果有什么疑问，请随时联系我",
+      "pinyin": "ruguo you shenme yiwen, qing suishi lianxi wo",
+      "candidates": [
+        {"text": "If you have any questions, please feel free to reach out to me.", "style": "自然推荐", "tone": "natural"},
+        {"text": "Should you have any inquiries, do not hesitate to contact me.", "style": "商务正式", "tone": "formal"},
+        {"text": "Let me know if you need anything else!", "style": "日常亲和", "tone": "casual"},
+        {"text": "Feel free to contact me with any questions.", "style": "精简常用", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "疑问", "pinyin": "yiwen", "translations": ["question", "inquiry", "query"], "pos": "名词"},
+        {"word": "随时", "pinyin": "suishi", "translations": ["feel free to", "at any time", "anytime"], "pos": "副词"},
+        {"word": "联系", "pinyin": "lianxi", "translations": ["contact", "reach out to", "get in touch with"], "pos": "动词"}
+      ]
+    },
+    {
+      "chinese": "稍等一下，我马上处理",
+      "pinyin": "shaodeng yixia, wo mashang chuli",
+      "candidates": [
+        {"text": "Just a moment, I will handle it right away.", "style": "自然推荐", "tone": "natural"},
+        {"text": "Please hold on briefly; I am attending to this matter immediately.", "style": "正式客气", "tone": "formal"},
+        {"text": "Hang on a sec, on it right now!", "style": "即时沟通", "tone": "casual"},
+        {"text": "One moment, handling it now.", "style": "精炼直接", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "稍等", "pinyin": "shaodeng", "translations": ["just a moment", "hold on", "one second"], "pos": "短语"},
+        {"word": "马上", "pinyin": "mashang", "translations": ["right away", "immediately", "straight away"], "pos": "副词"},
+        {"word": "处理", "pinyin": "chuli", "translations": ["handle", "take care of", "attend to"], "pos": "动词"}
+      ]
+    },
+    {
+      "chinese": "收到，非常感谢您的反馈",
+      "pinyin": "shoudao, feichang ganxie nin de fankui",
+      "candidates": [
+        {"text": "Got it, thank you very much for your feedback.", "style": "自然推荐", "tone": "natural"},
+        {"text": "Acknowledged with sincere gratitude for your valuable feedback.", "style": "商务正式", "tone": "formal"},
+        {"text": "Thanks a lot for the feedback!", "style": "日常口语", "tone": "casual"},
+        {"text": "Received, thanks for your feedback.", "style": "精炼回复", "tone": "concise"}
+      ],
+      "keywords": [
+        {"word": "收到", "pinyin": "shoudao", "translations": ["got it", "acknowledged", "received"], "pos": "动词"},
+        {"word": "非常感谢", "pinyin": "feichang ganxie", "translations": ["thank you very much", "thanks a lot"], "pos": "短语"},
+        {"word": "反馈", "pinyin": "fankui", "translations": ["feedback", "input", "comments"], "pos": "名词"}
+      ]
+    },
+    {
+      "chinese": "你好",
+      "pinyin": "nihao",
+      "candidates": [
+        {"text": "Hello", "style": "自然通用", "tone": "natural"},
+        {"text": "Good day / Greetings", "style": "正式礼貌", "tone": "formal"},
+        {"text": "Hi / Hey there", "style": "随和日常", "tone": "casual"}
+      ],
+      "keywords": [
+        {"word": "你好", "pinyin": "nihao", "translations": ["hello", "hi", "hey"], "pos": "打招呼"}
+      ]
+    },
+    {
+      "chinese": "谢谢",
+      "pinyin": "xiexie",
+      "candidates": [
+        {"text": "Thank you", "style": "标准礼貌", "tone": "natural"},
+        {"text": "Thank you very much / Much obliged", "style": "商务正式", "tone": "formal"},
+        {"text": "Thanks / Cheers", "style": "随和口语", "tone": "casual"}
+      ],
+      "keywords": [
+        {"word": "谢谢", "pinyin": "xiexie", "translations": ["thank you", "thanks", "appreciate it"], "pos": "表达感谢"}
+      ]
+    }
+  ],
+  "vocabulary": [
+    {"chinese": "需求", "pinyin": "xuqiu", "english": ["requirement", "demand", "feature request"], "pos": "n."},
+    {"chinese": "方案", "pinyin": "fangan", "english": ["solution", "proposal", "plan", "scheme"], "pos": "n."},
+    {"chinese": "设计", "pinyin": "sheji", "english": ["design", "architecture", "layout"], "pos": "n./v."},
+    {"chinese": "开发", "pinyin": "kaifa", "english": ["develop", "development", "build"], "pos": "v./n."},
+    {"chinese": "测试", "pinyin": "ceshi", "english": ["test", "testing", "verify", "validate"], "pos": "v./n."},
+    {"chinese": "发布", "pinyin": "fabu", "english": ["release", "launch", "deploy", "publish"], "pos": "v./n."},
+    {"chinese": "架构", "pinyin": "jiagou", "english": ["architecture", "framework", "structure"], "pos": "n."},
+    {"chinese": "性能", "pinyin": "xingneng", "english": ["performance", "capability", "efficiency"], "pos": "n."},
+    {"chinese": "优化", "pinyin": "youhua", "english": ["optimize", "optimization", "streamline"], "pos": "v./n."},
+    {"chinese": "会议", "pinyin": "huiyi", "english": ["meeting", "conference", "session"], "pos": "n."},
+    {"chinese": "日程", "pinyin": "richeng", "english": ["schedule", "agenda", "calendar", "timetable"], "pos": "n."},
+    {"chinese": "截止日期", "pinyin": "jiezhi riqi", "english": ["deadline", "due date", "cutoff date"], "pos": "n."},
+    {"chinese": "合同", "pinyin": "hetong", "english": ["contract", "agreement", "deal"], "pos": "n."},
+    {"chinese": "合作伙伴", "pinyin": "hezuo huoban", "english": ["partner", "collaborator", "associate"], "pos": "n."},
+    {"chinese": "预算", "pinyin": "yusuan", "english": ["budget", "financial estimate"], "pos": "n."},
+    {"chinese": "问题", "pinyin": "wenti", "english": ["issue", "problem", "question", "bug"], "pos": "n."},
+    {"chinese": "解决", "pinyin": "jiejue", "english": ["resolve", "solve", "settle", "fix"], "pos": "v."},
+    {"chinese": "沟通", "pinyin": "goutong", "english": ["communicate", "discuss", "sync up"], "pos": "v./n."},
+    {"chinese": "协作", "pinyin": "xiezuo", "english": ["collaborate", "teamwork", "cooperation"], "pos": "v./n."},
+    {"chinese": "效率", "pinyin": "xiaolü", "english": ["efficiency", "productivity"], "pos": "n."}
+  ]
+}
