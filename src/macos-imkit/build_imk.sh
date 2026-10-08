@@ -27,7 +27,9 @@ clang -O2 -fobjc-arc \
 cp "$DIR/Info.plist" "$CONTENTS_DIR/Info.plist"
 echo -n "APPLTRNS" > "$CONTENTS_DIR/PkgInfo"
 
-chmod +x "$MACOS_DIR/TranslateIME"
+chmod -R 755 "$IMK_APP_DIR"
+xattr -cr "$IMK_APP_DIR" 2>/dev/null || true
+codesign -s - --deep --force "$IMK_APP_DIR" 2>/dev/null || true
 
 echo "==> TranslateIME.app built successfully at: $IMK_APP_DIR"
 echo "==> To install to macOS system input sources:"

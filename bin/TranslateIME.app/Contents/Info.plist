@@ -22,10 +22,10 @@
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
     <string>11.0</string>
-    <key>LSUIElement</key>
+    <key>LSBackgroundOnly</key>
     <true/>
     <key>InputMethodConnectionName</key>
-    <string>TransIME_1_Connection</string>
+    <string>com.antigravity.inputmethod.TranslateIME_Connection</string>
     <key>InputMethodServerControllerClass</key>
     <string>TransInputController</string>
     <key>tsInputMethodCharacterRepertoireKey</key>
@@ -39,14 +39,16 @@
         <dict>
             <key>com.antigravity.inputmethod.TranslateIME.zh</key>
             <dict>
+                <key>TISInputSourceID</key>
+                <string>com.antigravity.inputmethod.TranslateIME.zh</string>
+                <key>TISIntendedLanguage</key>
+                <string>zh-Hans</string>
                 <key>tsInputModeIsVisibleKey</key>
                 <true/>
                 <key>tsInputModePrimaryInScriptKey</key>
                 <true/>
                 <key>tsInputModeScriptKey</key>
                 <string>smSimpChinese</string>
-                <key>tsInputModePaletteIconFileKey</key>
-                <string>icon.png</string>
             </dict>
         </dict>
     </dict>
