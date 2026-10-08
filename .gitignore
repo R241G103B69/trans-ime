@@ -3,3 +3,5 @@
 bin/TransType
 bin/test_engine
 bin/test_output
+dist/
+release/
