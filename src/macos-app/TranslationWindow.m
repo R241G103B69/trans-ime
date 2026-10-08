@@ -225,9 +225,15 @@
         [strongSelf.candidateView updateCandidates:candidates];
 
         if (candidates.count > 0) {
-            strongSelf.statusBar.stringValue = [NSString stringWithFormat:@"匹配到 %lu 个候选翻译 · 按 [↵] 或 [⌘1-%lu] 选词上屏",
-                                                (unsigned long)candidates.count,
-                                                (unsigned long)MIN(candidates.count, 7)];
+            BOOL hasPerm = [[TextOutputManager sharedManager] hasAccessibilityPermission];
+            if (hasPerm) {
+                strongSelf.statusBar.stringValue = [NSString stringWithFormat:@"匹配到 %lu 个候选翻译 · 按 [↵] 或 [⌘1-%lu] 自动上屏",
+                                                    (unsigned long)candidates.count,
+                                                    (unsigned long)MIN(candidates.count, 7)];
+            } else {
+                strongSelf.statusBar.stringValue = [NSString stringWithFormat:@"匹配到 %lu 个候选 · 未开启辅助功能(将复制，可⌘V粘贴)",
+                                                    (unsigned long)candidates.count];
+            }
         } else {
             strongSelf.statusBar.stringValue = @"未找到候选词 · 请继续输入";
         }

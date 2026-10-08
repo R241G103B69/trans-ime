@@ -8,6 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedManager;
 
+- (BOOL)hasAccessibilityPermission;
+- (void)requestAccessibilityPermission;
+
 /// Call this immediately before presenting the translation window to capture target focus
 - (void)captureTargetApplication;
 

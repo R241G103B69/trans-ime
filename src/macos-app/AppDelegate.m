@@ -2,6 +2,7 @@
 #import "TranslationWindow.h"
 #import "LocalDictionary.h"
 #import "TranslationEngine.h"
+#import "TextOutputManager.h"
 #import <Carbon/Carbon.h>
 
 static OSStatus HotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData) {
@@ -45,6 +46,11 @@ static OSStatus HotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent
 
     // 5. Pre-warm window
     [TranslationWindow sharedWindow];
+
+    // 6. Check and request accessibility permission for auto-typing
+    if (![[TextOutputManager sharedManager] hasAccessibilityPermission]) {
+        [[TextOutputManager sharedManager] requestAccessibilityPermission];
+    }
 }
 
 - (void)setupStatusBar {
@@ -74,12 +80,30 @@ static OSStatus HotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent
 
     [menu addItem:[NSMenuItem separatorItem]];
 
+    BOOL hasPerm = [[TextOutputManager sharedManager] hasAccessibilityPermission];
+    if (hasPerm) {
+        NSMenuItem *permItem = [[NSMenuItem alloc] initWithTitle:@"✅ 自动上屏权限: 已开启" action:nil keyEquivalent:@""];
+        permItem.enabled = NO;
+        [menu addItem:permItem];
+    } else {
+        NSMenuItem *permItem = [[NSMenuItem alloc] initWithTitle:@"⚠️ 开启自动上屏权限 (点击开启)..." action:@selector(openAccessibilitySettings) keyEquivalent:@""];
+        [menu addItem:permItem];
+    }
+
+    [menu addItem:[NSMenuItem separatorItem]];
+
     NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:@"退出 TransType"
                                                       action:@selector(quitApp)
                                                keyEquivalent:@"q"];
     [menu addItem:quitItem];
 
     self.statusItem.menu = menu;
+}
+
+- (void)openAccessibilitySettings {
+    [[TextOutputManager sharedManager] requestAccessibilityPermission];
+    NSString *urlString = @"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
 }
 
 - (void)registerGlobalHotkey {
