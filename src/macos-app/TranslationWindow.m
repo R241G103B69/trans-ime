@@ -177,6 +177,7 @@
 
 - (void)dismissWindow {
     [self orderOut:nil];
+    [NSApp hide:nil];
 }
 
 #pragma mark - NSTextFieldDelegate & Key Events

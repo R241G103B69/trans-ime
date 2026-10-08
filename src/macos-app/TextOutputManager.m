@@ -13,6 +13,31 @@
     return instance;
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        // Automatically track whatever external app the user is interacting with!
+        [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                               selector:@selector(onAppActivated:)
+                                                                   name:NSWorkspaceDidActivateApplicationNotification
+                                                                 object:nil];
+        
+        // Initial capture
+        [self captureTargetApplication];
+    }
+    return self;
+}
+
+- (void)onAppActivated:(NSNotification *)note {
+    NSRunningApplication *app = note.userInfo[NSWorkspaceApplicationKey];
+    NSString *myBundleId = [[NSBundle mainBundle] bundleIdentifier];
+    if (app && ![app.bundleIdentifier isEqualToString:myBundleId]) {
+        self.targetApp = app;
+        NSLog(@"[TextOutputManager] Auto-tracked active app: %@ (%@, pid: %d)",
+              app.localizedName, app.bundleIdentifier, app.processIdentifier);
+    }
+}
+
 - (BOOL)hasAccessibilityPermission {
     return AXIsProcessTrusted();
 }
@@ -25,10 +50,10 @@
 - (void)captureTargetApplication {
     NSRunningApplication *frontApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
     NSString *myBundleId = [[NSBundle mainBundle] bundleIdentifier];
-    // Don't capture our own app as the target
     if (frontApp && ![frontApp.bundleIdentifier isEqualToString:myBundleId]) {
         self.targetApp = frontApp;
-        NSLog(@"[TextOutputManager] Captured target app: %@ (%@)", frontApp.localizedName, frontApp.bundleIdentifier);
+        NSLog(@"[TextOutputManager] Explicitly captured target app: %@ (%@)",
+              frontApp.localizedName, frontApp.bundleIdentifier);
     }
 }
 
@@ -40,29 +65,23 @@
 
     NSLog(@"[TextOutputManager] Committing English text: %@", text);
 
-    // 1. Always put English text onto pasteboard so user has it immediately
+    // 1. Write text to general pasteboard
     NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
     [pasteboard clearContents];
     [pasteboard setString:text forType:NSPasteboardTypeString];
 
-    // 2. Check Accessibility permission
-    BOOL isTrusted = [self hasAccessibilityPermission];
-    if (!isTrusted) {
-        NSLog(@"[TextOutputManager] WARNING: Accessibility permission not granted. Prompting user...");
-        [self requestAccessibilityPermission];
-    }
-
-    // 3. Reactivate target application
+    // 2. Reactivate target application
     NSRunningApplication *target = self.targetApp;
     if (target) {
+        NSLog(@"[TextOutputManager] Reactivating target app: %@ (pid: %d)", target.localizedName, target.processIdentifier);
         #pragma clang diagnostic push
         #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [target activateWithOptions:NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps];
+        [target activateWithOptions:NSApplicationActivateIgnoringOtherApps];
         #pragma clang diagnostic pop
     }
 
-    // 4. Send paste command after target application window regains focus
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(160 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+    // 3. Dispatch paste event after window focus settles
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
         [self synthesizePasteCommandWithTarget:target];
 
         if (completion) completion(YES);
@@ -70,47 +89,56 @@
 }
 
 - (void)synthesizePasteCommandWithTarget:(nullable NSRunningApplication *)target {
-    pid_t targetPid = target ? target.processIdentifier : 0;
-
-    // Method 1: CGEventPost with Command+V
+    // Standard full Command+V keystroke sequence
     CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
     if (source) {
-        CGKeyCode vKeyCode = (CGKeyCode)9; // 'v' key in US QWERTY layout
-        CGEventRef keyDown = CGEventCreateKeyboardEvent(source, vKeyCode, true);
-        CGEventRef keyUp = CGEventCreateKeyboardEvent(source, vKeyCode, false);
+        CGKeyCode cmdKey = (CGKeyCode)55; // Left Command key (0x37)
+        CGKeyCode vKey   = (CGKeyCode)9;  // 'v' key in US layout (0x09)
 
-        if (keyDown && keyUp) {
-            CGEventSetFlags(keyDown, kCGEventFlagMaskCommand);
-            CGEventSetFlags(keyUp, kCGEventFlagMaskCommand);
+        // 1. Command Down
+        CGEventRef cmdDown = CGEventCreateKeyboardEvent(source, cmdKey, true);
+        CGEventSetFlags(cmdDown, kCGEventFlagMaskCommand);
+        CGEventPost(kCGHIDEventTap, cmdDown);
+        CFRelease(cmdDown);
 
-            // Post to target PID directly if available, or to system event tap
-            if (targetPid > 0) {
-                CGEventPostToPid(targetPid, keyDown);
-                usleep(25000); // 25ms
-                CGEventPostToPid(targetPid, keyUp);
-            }
+        usleep(15000); // 15ms
 
-            // Also post to HID Event Tap for universal compatibility
-            CGEventPost(kCGHIDEventTap, keyDown);
-            usleep(25000); // 25ms
-            CGEventPost(kCGHIDEventTap, keyUp);
+        // 2. 'v' Down with Command flag
+        CGEventRef vDown = CGEventCreateKeyboardEvent(source, vKey, true);
+        CGEventSetFlags(vDown, kCGEventFlagMaskCommand);
+        CGEventPost(kCGHIDEventTap, vDown);
+        CFRelease(vDown);
 
-            CFRelease(keyDown);
-            CFRelease(keyUp);
-            CFRelease(source);
-            return;
-        }
+        usleep(25000); // 25ms
+
+        // 3. 'v' Up with Command flag
+        CGEventRef vUp = CGEventCreateKeyboardEvent(source, vKey, false);
+        CGEventSetFlags(vUp, kCGEventFlagMaskCommand);
+        CGEventPost(kCGHIDEventTap, vUp);
+        CFRelease(vUp);
+
+        usleep(15000); // 15ms
+
+        // 4. Command Up
+        CGEventRef cmdUp = CGEventCreateKeyboardEvent(source, cmdKey, false);
+        CGEventSetFlags(cmdUp, 0);
+        CGEventPost(kCGHIDEventTap, cmdUp);
+        CFRelease(cmdUp);
+
         CFRelease(source);
+        NSLog(@"[TextOutputManager] Synthesized complete Command+V sequence via CGEvent.");
     }
 
-    // Method 2: Fallback via AppleScript System Events keystroke
-    NSString *scriptStr = @"tell application \"System Events\" to keystroke \"v\" using {command down}";
-    NSAppleScript *appleScript = [[NSAppleScript alloc] initWithSource:scriptStr];
-    NSDictionary *err = nil;
-    [appleScript executeAndReturnError:&err];
-    if (err) {
-        NSLog(@"[TextOutputManager] AppleScript fallback message: %@", err);
-    }
+    // Secondary fallback: AppleScript keystroke
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(80 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+        NSString *scriptStr = @"tell application \"System Events\" to keystroke \"v\" using command down";
+        NSAppleScript *appleScript = [[NSAppleScript alloc] initWithSource:scriptStr];
+        NSDictionary *err = nil;
+        [appleScript executeAndReturnError:&err];
+        if (err) {
+            NSLog(@"[TextOutputManager] AppleScript fallback notice: %@", err);
+        }
+    });
 }
 
 @end
