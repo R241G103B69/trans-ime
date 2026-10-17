@@ -2,6 +2,10 @@
 #import <Carbon/Carbon.h>
 #import <ApplicationServices/ApplicationServices.h>
 
+@interface TextOutputManager ()
+@property (nonatomic, assign) BOOL isCommitting;
+@end
+
 @implementation TextOutputManager
 
 + (instancetype)sharedManager {
@@ -16,6 +20,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        _isCommitting = NO;
         // Automatically track whatever external app the user is interacting with!
         [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
                                                                selector:@selector(onAppActivated:)
@@ -63,6 +68,14 @@
         return;
     }
 
+    // Debounce / Anti-double-commit guard
+    if (self.isCommitting) {
+        NSLog(@"[TextOutputManager] Ignored duplicate commit request for: %@", text);
+        if (completion) completion(NO);
+        return;
+    }
+    self.isCommitting = YES;
+
     NSLog(@"[TextOutputManager] Committing English text: %@", text);
 
     // 1. Write text to general pasteboard
@@ -80,16 +93,21 @@
         #pragma clang diagnostic pop
     }
 
-    // 3. Dispatch paste event after window focus settles
+    // 3. Dispatch EXACTLY ONE paste event after window focus settles
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
         [self synthesizePasteCommandWithTarget:target];
 
         if (completion) completion(YES);
     });
+
+    // Reset committing flag after short debounce period
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(350 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+        self.isCommitting = NO;
+    });
 }
 
 - (void)synthesizePasteCommandWithTarget:(nullable NSRunningApplication *)target {
-    // Standard full Command+V keystroke sequence
+    // Standard full Command+V keystroke sequence via CGEvent
     CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
     if (source) {
         CGKeyCode cmdKey = (CGKeyCode)55; // Left Command key (0x37)
@@ -126,19 +144,19 @@
         CFRelease(cmdUp);
 
         CFRelease(source);
-        NSLog(@"[TextOutputManager] Synthesized complete Command+V sequence via CGEvent.");
+        NSLog(@"[TextOutputManager] Successfully synthesized single Command+V via CGEvent.");
+        return; // Return immediately! NEVER fall through to secondary AppleScript!
     }
 
-    // Secondary fallback: AppleScript keystroke
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(80 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-        NSString *scriptStr = @"tell application \"System Events\" to keystroke \"v\" using command down";
-        NSAppleScript *appleScript = [[NSAppleScript alloc] initWithSource:scriptStr];
-        NSDictionary *err = nil;
-        [appleScript executeAndReturnError:&err];
-        if (err) {
-            NSLog(@"[TextOutputManager] AppleScript fallback notice: %@", err);
-        }
-    });
+    // Fallback ONLY IF CGEventSource failed to initialize
+    NSLog(@"[TextOutputManager] CGEventSource unavailable, falling back to AppleScript.");
+    NSString *scriptStr = @"tell application \"System Events\" to keystroke \"v\" using command down";
+    NSAppleScript *appleScript = [[NSAppleScript alloc] initWithSource:scriptStr];
+    NSDictionary *err = nil;
+    [appleScript executeAndReturnError:&err];
+    if (err) {
+        NSLog(@"[TextOutputManager] AppleScript fallback notice: %@", err);
+    }
 }
 
 @end
