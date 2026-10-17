@@ -31,4 +31,7 @@ cp "$PROJECT_ROOT/src/macos-app/Resources/dictionary.json" "$RESOURCES_DIR/dicti
 
 chmod +x "$MACOS_DIR/TransType"
 
+# 4. Sign the app bundle with persistent designated requirement
+codesign --force --deep -s - -r='designated => identifier "com.antigravity.TransType"' "$APP_DIR"
+
 echo "==> TransType.app built successfully at: $APP_DIR"

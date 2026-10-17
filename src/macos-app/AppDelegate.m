@@ -58,6 +58,7 @@ static OSStatus HotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent
     self.statusItem.button.title = @"[译] TransType";
 
     NSMenu *menu = [[NSMenu alloc] init];
+    menu.delegate = self;
 
     NSMenuItem *showItem = [[NSMenuItem alloc] initWithTitle:@"呼出翻译输入法 (⌥ Space)"
                                                       action:@selector(showTranslationWindow)
@@ -80,15 +81,9 @@ static OSStatus HotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent
 
     [menu addItem:[NSMenuItem separatorItem]];
 
-    BOOL hasPerm = [[TextOutputManager sharedManager] hasAccessibilityPermission];
-    if (hasPerm) {
-        NSMenuItem *permItem = [[NSMenuItem alloc] initWithTitle:@"✅ 自动上屏权限: 已开启" action:nil keyEquivalent:@""];
-        permItem.enabled = NO;
-        [menu addItem:permItem];
-    } else {
-        NSMenuItem *permItem = [[NSMenuItem alloc] initWithTitle:@"⚠️ 开启自动上屏权限 (点击开启)..." action:@selector(openAccessibilitySettings) keyEquivalent:@""];
-        [menu addItem:permItem];
-    }
+    NSMenuItem *permItem = [[NSMenuItem alloc] initWithTitle:@"检查权限中..." action:nil keyEquivalent:@""];
+    permItem.tag = 1001;
+    [menu addItem:permItem];
 
     [menu addItem:[NSMenuItem separatorItem]];
 
@@ -98,6 +93,31 @@ static OSStatus HotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent
     [menu addItem:quitItem];
 
     self.statusItem.menu = menu;
+    [self updatePermissionMenuItemInMenu:menu];
+}
+
+#pragma mark - NSMenuDelegate
+
+- (void)menuWillOpen:(NSMenu *)menu {
+    [self updatePermissionMenuItemInMenu:menu];
+}
+
+- (void)updatePermissionMenuItemInMenu:(NSMenu *)menu {
+    BOOL hasPerm = [[TextOutputManager sharedManager] hasAccessibilityPermission];
+    NSMenuItem *permItem = [menu itemWithTag:1001];
+    if (permItem) {
+        if (hasPerm) {
+            permItem.title = @"✅ 自动上屏权限: 已开启";
+            permItem.action = nil;
+            permItem.target = nil;
+            permItem.enabled = NO;
+        } else {
+            permItem.title = @"⚠️ 开启自动上屏权限 (点击开启)...";
+            permItem.action = @selector(openAccessibilitySettings);
+            permItem.target = self;
+            permItem.enabled = YES;
+        }
+    }
 }
 
 - (void)openAccessibilitySettings {

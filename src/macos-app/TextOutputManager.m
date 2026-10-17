@@ -33,10 +33,41 @@
     return self;
 }
 
+- (BOOL)isSystemOrUtilityApp:(nullable NSRunningApplication *)app {
+    if (!app || !app.bundleIdentifier) return YES;
+
+    NSString *bundleId = app.bundleIdentifier;
+    NSString *myBundleId = [[NSBundle mainBundle] bundleIdentifier];
+    if ([bundleId isEqualToString:myBundleId]) {
+        return YES;
+    }
+
+    // System utility / background applications where user cannot type documents
+    static NSSet *systemBundleIds = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        systemBundleIds = [NSSet setWithObjects:
+            @"com.apple.systempreferences",
+            @"com.apple.SystemSettings",
+            @"com.apple.dock",
+            @"com.apple.Spotlight",
+            @"com.apple.loginwindow",
+            @"com.apple.controlcenter",
+            @"com.apple.notificationcenterui",
+            @"com.apple.WindowManager",
+            @"com.apple.accessibility.AccessibilityUIServer",
+            @"com.apple.TextInputMenuAgent",
+            @"com.apple.TextInputSwitcher",
+            @"com.apple.screencaptureui",
+            nil];
+    });
+
+    return [systemBundleIds containsObject:bundleId];
+}
+
 - (void)onAppActivated:(NSNotification *)note {
     NSRunningApplication *app = note.userInfo[NSWorkspaceApplicationKey];
-    NSString *myBundleId = [[NSBundle mainBundle] bundleIdentifier];
-    if (app && ![app.bundleIdentifier isEqualToString:myBundleId]) {
+    if (app && ![self isSystemOrUtilityApp:app]) {
         self.targetApp = app;
         NSLog(@"[TextOutputManager] Auto-tracked active app: %@ (%@, pid: %d)",
               app.localizedName, app.bundleIdentifier, app.processIdentifier);
@@ -54,11 +85,21 @@
 
 - (void)captureTargetApplication {
     NSRunningApplication *frontApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-    NSString *myBundleId = [[NSBundle mainBundle] bundleIdentifier];
-    if (frontApp && ![frontApp.bundleIdentifier isEqualToString:myBundleId]) {
+    if (frontApp && ![self isSystemOrUtilityApp:frontApp]) {
         self.targetApp = frontApp;
         NSLog(@"[TextOutputManager] Explicitly captured target app: %@ (%@)",
               frontApp.localizedName, frontApp.bundleIdentifier);
+    } else if (!self.targetApp || self.targetApp.isTerminated) {
+        // Fallback: look for the most relevant active regular application
+        NSArray<NSRunningApplication *> *apps = [[NSWorkspace sharedWorkspace] runningApplications];
+        for (NSRunningApplication *app in apps) {
+            if (app.activationPolicy == NSApplicationActivationPolicyRegular && ![self isSystemOrUtilityApp:app]) {
+                self.targetApp = app;
+                NSLog(@"[TextOutputManager] Fallback captured target app: %@ (%@)",
+                      app.localizedName, app.bundleIdentifier);
+                break;
+            }
+        }
     }
 }
 

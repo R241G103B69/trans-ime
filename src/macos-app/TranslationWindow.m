@@ -172,6 +172,13 @@
     // Pre-populate with current text or clear
     if (self.inputField.stringValue.length > 0) {
         [self queryTranslation:self.inputField.stringValue];
+    } else {
+        BOOL hasPerm = [[TextOutputManager sharedManager] hasAccessibilityPermission];
+        if (hasPerm) {
+            self.statusBar.stringValue = @"[↵] 确认首选 · [⌘1-7] 选词上屏 · [↑/↓] 切换 · [ESC] 取消";
+        } else {
+            self.statusBar.stringValue = @"⚠️ 辅助功能权限未就绪（将复制到剪贴板，可点击状态栏图标开启）";
+        }
     }
 }
 
